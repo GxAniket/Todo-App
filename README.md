@@ -1,44 +1,92 @@
-# Todo App
+# 📝 Todo App
 
-A modern productivity and task management application built with React.js and TypeScript. The application helps users organize tasks, manage priorities, plan schedules, and maintain a focused workflow.
+A modern and responsive **task management and productivity application** built with **React.js and TypeScript**. Todo helps users organize daily tasks, manage priorities, plan study sessions, and stay focused with built-in productivity tools.
 
-## Overview
+🔗 **Live Demo:** https://todo-app-two-sigma-85.vercel.app/
 
-Todo App provides a simple interface for managing daily tasks and study activities. Users can create, edit, complete, and delete tasks, organize tasks by priority, and view their schedule across different time periods.
+---
 
-The application also includes a study planner and Pomodoro timer to support focused study sessions.
+## ✨ Overview
 
-## Features
+**Todo App** is designed to make everyday task and study management simple and organized.
 
+Users can create, edit, complete, and delete tasks while managing priorities and schedules. The application also provides dedicated views for daily, weekly, and monthly planning.
+
+For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help organize study goals and maintain focused work sessions.
+
+---
+
+## 🚀 Features
+
+### 📋 Task Management
 - Create tasks with title, date, time, and priority
 - Edit existing tasks
 - Mark tasks as completed
 - Delete tasks
-- Manage Low, Medium, and High priority tasks
-- View tasks for today
-- View tasks by week
-- View tasks by month
-- Study planner for chapters and study goals
-- Pomodoro timer
-- Dark and light themes
-- Responsive user interface
-- Persistent local data storage
+- Set task priority:
+  - 🟢 Low
+  - 🟡 Medium
+  - 🔴 High
 
-## Tech Stack
+### 📅 Task Views
+- 🏠 Dashboard / Home
+- 📌 Today's tasks
+- 📆 Weekly task view
+- 🗓️ Monthly task view
+
+### 📚 Study & Productivity
+- Study planner
+- Create study goals and chapters
+- Pomodoro timer for focused sessions
+- Organize study activities alongside regular tasks
+
+### 🎨 User Experience
+- 🌙 Dark mode
+- ☀️ Light mode
+- 📱 Responsive design
+- 💾 Persistent data using Browser Local Storage
+- ⚡ Fast and modern React interface
+
+---
+
+## 🛠️ Tech Stack
 
 | Category | Technology |
-|----------|------------|
+|---|---|
 | Frontend | React.js |
-| Language | TypeScript |
+| Programming Language | TypeScript |
 | Styling | Tailwind CSS |
 | Build Tool | Vite |
-| Storage | Browser Local Storage |
+| Data Storage | Browser Local Storage |
 | Version Control | Git & GitHub |
+| Deployment | Vercel |
 
-## Project Structure
+---
 
-<pre>
-Todo App /
+## 📸 Screenshot
+
+<p align="center">
+  <img 
+    src="https://github.com/user-attachments/assets/dcf6782d-04aa-4ac0-b1ea-7cb2bd9d5638"
+    alt="Todo App Screenshot"
+    width="100%"
+  />
+</p>
+
+---
+
+## 🌐 Live Demo
+
+Try the application here:
+
+👉 **https://todo-app-two-sigma-85.vercel.app/**
+
+---
+
+## 📂 Project Structure
+
+```text
+Todo App/
 ├── public/
 │   └── assets/
 │
@@ -57,45 +105,115 @@ Todo App /
 │   ├── main.tsx
 │   └── ...
 │
+├── public/
 ├── package.json
-├── vite.config.js
+├── vite.config.ts
 ├── index.html
 └── README.md
-</pre>
+```
+
+---
+
+## ⚙️ Getting Started
+
+Follow these steps to run the project locally.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/GxAniket/Todo-App.git
+```
+
+### 2. Navigate to the project directory
+
+```bash
+cd Todo-App
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+The application will be available at the local development URL shown in your terminal.
+
+---
+
+## 📦 Build for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+To preview the production build locally:
+
+```bash
+npm run preview
+```
+
+---
+
+## 💾 Data Storage
+
+Todo App uses the browser's **Local Storage API** to persist task and application data.
+
+This means tasks remain available after refreshing or reopening the application in the same browser.
+
+> Note: Data is stored locally in the user's browser and is not synchronized across different devices.
+
 ---
 
 ## 🤝 Contributing
 
-Contributions, suggestions, and improvements are welcome.
+Contributions, suggestions, and improvements are welcome!
 
-If you have an idea that can improve **Todo**, feel free to:
+If you have an idea that can improve **Todo App**, you can:
 
-- 🌟 Star the repository
+- ⭐ Star the repository
 - 🍴 Fork the repository
-- 📝 Open an issue
+- 🐛 Open an issue
 - 🔀 Create a pull request
 
 ---
 
 ## 🧠 Learning & Development
 
-This project is part of my journey to improve my skills in **React.js, TypeScript, frontend development, responsive design, and modern UI/UX development**.
+This project is part of my journey to improve my skills in:
 
-Building Todo helps me understand how to transform an idea into a functional, responsive, and user-friendly productivity application.
+- React.js
+- TypeScript
+- Tailwind CSS
+- Frontend development
+- Responsive web design
+- Modern UI/UX
+- State management
+- Browser Local Storage
+- Component-based architecture
+
+Building Todo App helped me understand how to transform a productivity concept into a functional and responsive web application.
 
 ---
 
-## 🌐 Connect with Me
+## 👨‍💻 Connect with Me
 
 <p align="center">
   <a href="https://github.com/GxAniket">
     <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
-
+  
   <a href="mailto:sundriyalaniket@gmail.com">
     <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
   </a>
-
+  
   <a href="https://www.linkedin.com/in/aniket-sundriyal">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
   </a>
@@ -104,5 +222,5 @@ Building Todo helps me understand how to transform an idea into a functional, re
 ---
 
 <p align="center">
-  ✨ <strong>Todo App </strong> — Plan. Focus. Complete.
+  ✨ <strong>Todo App — Plan. Focus. Complete.</strong> ✨
 </p>
