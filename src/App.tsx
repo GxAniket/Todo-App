@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useRef,
 } from 'react';
 
 import type {
@@ -14,6 +15,7 @@ import type {
   Subject,
   ThemeId,
   CursorStyle,
+  TimerMode,
 } from './types';
 
 import { themes } from './themes';
@@ -29,6 +31,21 @@ interface AppState {
   setTheme: (id: ThemeId) => void;
   cursorStyle: CursorStyle;
   setCursorStyle: (style: CursorStyle) => void;
+  remindersEnabled: boolean;
+  setRemindersEnabled: (enabled: boolean) => void;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
+  testReminderSound: () => void;
+  notifyTimerComplete: (title: string, body: string) => void;
+  timerMode: TimerMode;
+  setTimerMode: (mode: TimerMode) => void;
+  customMinutes: number;
+  setCustomMinutes: (minutes: number | ((previous: number) => number)) => void;
+  secondsLeft: number;
+  setSecondsLeft: (seconds: number) => void;
+  isRunning: boolean;
+  setIsRunning: (running: boolean) => void;
+  sessionsCompleted: number;
 
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
@@ -113,6 +130,21 @@ export default function App() {
   const [cursorStyle, setCursorStyle] = useState<CursorStyle>(() =>
     loadData<CursorStyle>('todo-cursor-style', 'default')
   );
+  const [remindersEnabled, setRemindersEnabled] = useState(() =>
+    loadData<boolean>('todo-reminders-enabled', false)
+  );
+  const [soundEnabled, setSoundEnabled] = useState(() =>
+    loadData<boolean>('todo-reminder-sound-enabled', false)
+  );
+  const [timerMode, setTimerMode] = useState<TimerMode>('focus');
+  const [customMinutes, setCustomMinutes] = useState(25);
+  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [sessionsCompleted, setSessionsCompleted] = useState(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const notifiedReminderIdsRef = useRef<Set<string>>(
+    new Set(loadData<string[]>('todo-notified-reminders', []))
+  );
 
   // =========================
   // TASKS
@@ -186,6 +218,129 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('todo-cursor-style', JSON.stringify(cursorStyle));
   }, [cursorStyle]);
+
+  useEffect(() => {
+    localStorage.setItem('todo-reminders-enabled', JSON.stringify(remindersEnabled));
+  }, [remindersEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('todo-reminder-sound-enabled', JSON.stringify(soundEnabled));
+  }, [soundEnabled]);
+
+  const playReminderSound = useCallback(() => {
+    if (typeof window === 'undefined' || !window.AudioContext) return;
+    const audioContext = audioContextRef.current ?? new window.AudioContext();
+    audioContextRef.current = audioContext;
+    if (audioContext.state === 'suspended') void audioContext.resume();
+
+    const now = audioContext.currentTime;
+    [880, 1174].forEach((frequency, index) => {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const start = now + index * 0.16;
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.14);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(start);
+      oscillator.stop(start + 0.15);
+    });
+  }, []);
+
+  const notifyTimerComplete = useCallback((title: string, body: string) => {
+    if (
+      remindersEnabled &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
+      try {
+        new Notification(title, { body, icon: '/todo-logo.png' });
+      } catch {
+        // The timer sound can still provide an alert if browser notifications are unavailable.
+      }
+    }
+    if (soundEnabled) playReminderSound();
+  }, [remindersEnabled, soundEnabled, playReminderSound]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+
+    if (secondsLeft <= 1) {
+      setIsRunning(false);
+      setSecondsLeft(customMinutes * 60);
+      if (timerMode === 'focus') {
+        setSessionsCompleted((value) => value + 1);
+      }
+      notifyTimerComplete(
+        timerMode === 'focus' ? 'Focus session complete' : 'Break complete',
+        timerMode === 'focus' ? 'Your focus timer has finished.' : 'Your break timer has finished.'
+      );
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setSecondsLeft((previous) => previous - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, [isRunning, secondsLeft, timerMode, customMinutes, notifyTimerComplete]);
+
+  useEffect(() => {
+    if (!remindersEnabled && !soundEnabled) return;
+
+    const checkDueTasks = () => {
+      const now = Date.now();
+      let historyChanged = false;
+
+      tasks.forEach((task) => {
+        if (task.deleted || task.completed || !task.time) return;
+
+        const dueAt = new Date(`${task.date}T${task.time}:00`);
+        if (Number.isNaN(dueAt.getTime())) return;
+        const reminderId = `${task.id}:${task.date}:${task.time}`;
+        if (notifiedReminderIdsRef.current.has(reminderId)) return;
+
+        const age = now - dueAt.getTime();
+        if (age < 0) return;
+
+        notifiedReminderIdsRef.current.add(reminderId);
+        historyChanged = true;
+        if (age > 5 * 60 * 1000) return;
+
+        if (
+          remindersEnabled &&
+          'Notification' in window &&
+          Notification.permission === 'granted'
+        ) {
+          try {
+            new Notification(`Task reminder: ${task.title}`, {
+              body: `Scheduled for ${task.time}`,
+              icon: '/todo-logo.png',
+              tag: `task-reminder-${reminderId}`,
+            });
+          } catch {
+            // Browser notification support can vary; the sound reminder can still play.
+          }
+        }
+
+        if (soundEnabled) playReminderSound();
+      });
+
+      if (historyChanged) {
+        localStorage.setItem(
+          'todo-notified-reminders',
+          JSON.stringify([...notifiedReminderIdsRef.current].slice(-500))
+        );
+      }
+    };
+
+    checkDueTasks();
+    const intervalId = window.setInterval(checkDueTasks, 15_000);
+    return () => window.clearInterval(intervalId);
+  }, [tasks, remindersEnabled, soundEnabled, playReminderSound]);
 
   // =========================
   // SAVE TASKS
@@ -286,6 +441,8 @@ export default function App() {
     setStudySessions([]);
     localStorage.removeItem('todo-tasks');
     localStorage.removeItem('todo-study-sessions');
+    localStorage.removeItem('todo-notified-reminders');
+    notifiedReminderIdsRef.current.clear();
   }, []);
 
   // =========================
@@ -350,6 +507,21 @@ export default function App() {
         setTheme,
         cursorStyle,
         setCursorStyle,
+        remindersEnabled,
+        setRemindersEnabled,
+        soundEnabled,
+        setSoundEnabled,
+        testReminderSound: playReminderSound,
+        notifyTimerComplete,
+        timerMode,
+        setTimerMode,
+        customMinutes,
+        setCustomMinutes,
+        secondsLeft,
+        setSecondsLeft,
+        isRunning,
+        setIsRunning,
+        sessionsCompleted,
 
         tasks,
         addTask,

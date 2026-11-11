@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../App';
+import type { TimerMode } from '../types';
 
 interface Goal {
   id: string;
@@ -8,8 +9,6 @@ interface Goal {
   completed: boolean;
 }
 
-type TimerMode = 'focus' | 'short' | 'long';
-
 const DEFAULT_TIMES: Record<TimerMode, number> = {
   focus: 25,
   short: 5,
@@ -17,26 +16,22 @@ const DEFAULT_TIMES: Record<TimerMode, number> = {
 };
 
 export default function StudyView() {
-  const { theme } = useApp();
+  const {
+    theme,
+    timerMode,
+    setTimerMode,
+    customMinutes,
+    setCustomMinutes,
+    secondsLeft,
+    setSecondsLeft,
+    isRunning,
+    setIsRunning,
+    sessionsCompleted,
+  } = useApp();
 
   // =====================================================
   // POMODORO
   // =====================================================
-
-  const [timerMode, setTimerMode] =
-    useState<TimerMode>('focus');
-
-  const [customMinutes, setCustomMinutes] =
-    useState(25);
-
-  const [secondsLeft, setSecondsLeft] =
-    useState(25 * 60);
-
-  const [isRunning, setIsRunning] =
-    useState(false);
-
-  const [sessionsCompleted, setSessionsCompleted] =
-    useState(0);
 
   // =====================================================
   // TODAY'S GOALS
@@ -53,39 +48,6 @@ export default function StudyView() {
 
   const [subject, setSubject] =
     useState('');
-
-  // =====================================================
-  // TIMER
-  // =====================================================
-
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const interval = window.setInterval(() => {
-      setSecondsLeft((previous) => {
-        if (previous <= 1) {
-          setIsRunning(false);
-
-          if (timerMode === 'focus') {
-            setSessionsCompleted(
-              (value) => value + 1
-            );
-          }
-
-          return customMinutes * 60;
-        }
-
-        return previous - 1;
-      });
-    }, 1000);
-
-    return () =>
-      window.clearInterval(interval);
-  }, [
-    isRunning,
-    timerMode,
-    customMinutes,
-  ]);
 
   // =====================================================
   // CHANGE TIMER MODE

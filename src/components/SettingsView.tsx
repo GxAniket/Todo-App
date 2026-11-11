@@ -27,10 +27,16 @@ export default function SettingsView() {
     clearSavedData,
     cursorStyle,
     setCursorStyle,
+    remindersEnabled,
+    setRemindersEnabled,
+    soundEnabled,
+    setSoundEnabled,
+    testReminderSound,
   } = useApp();
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(userName);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState('');
 
   const completedTasks = tasks.filter(
     (task) => task.completed && !task.deleted
@@ -256,6 +262,72 @@ export default function SettingsView() {
           </div>
 
         </div>
+      </section>
+
+      <section
+        className="rounded-3xl p-6 mb-6"
+        style={{ background: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+      >
+        <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: theme.accent1 }}>
+          Notifications &amp; sound
+        </p>
+        <p className="text-sm mb-4" style={{ color: theme.textSecondary }}>
+          Task reminders use the scheduled date and time; study timers alert when they finish. The page must stay open.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={async () => {
+              if (remindersEnabled) {
+                setRemindersEnabled(false);
+                setReminderMessage('Browser reminders are off.');
+                return;
+              }
+              if (!('Notification' in window)) {
+                setReminderMessage('This browser does not support notifications.');
+                return;
+              }
+              const permission = Notification.permission === 'granted'
+                ? 'granted'
+                : await Notification.requestPermission();
+              if (permission === 'granted') {
+                setRemindersEnabled(true);
+                setReminderMessage('Browser reminders are on.');
+              } else if (permission === 'denied') {
+                setRemindersEnabled(false);
+                setReminderMessage('Notifications are blocked in browser settings.');
+              } else {
+                setReminderMessage('Allow notifications in the browser prompt to turn reminders on.');
+              }
+            }}
+            className="rounded-xl px-4 py-2 text-sm font-semibold"
+            style={{
+              background: remindersEnabled ? `${theme.accent1}20` : `linear-gradient(135deg,${theme.accent1},${theme.accent2})`,
+              color: remindersEnabled ? theme.accent1 : '#fff',
+            }}
+          >
+            {remindersEnabled ? 'Turn off reminders' : 'Enable browser reminders'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="rounded-xl px-4 py-2 text-sm font-semibold"
+            style={{ background: soundEnabled ? `${theme.accent3}20` : `${theme.textPrimary}08`, color: soundEnabled ? theme.accent3 : theme.textPrimary, border: `1px solid ${theme.cardBorder}` }}
+          >
+            Task sound: {soundEnabled ? 'On' : 'Off'}
+          </button>
+          <button
+            type="button"
+            onClick={testReminderSound}
+            className="rounded-xl px-4 py-2 text-sm font-semibold"
+            style={{ background: `${theme.textPrimary}08`, color: theme.textSecondary, border: `1px solid ${theme.cardBorder}` }}
+          >Test sound</button>
+        </div>
+        <p className="text-xs mt-3" style={{ color: theme.textSecondary }} aria-live="polite">
+          {reminderMessage || (typeof window !== 'undefined' && 'Notification' in window
+            ? `Browser permission: ${Notification.permission}.`
+            : 'Browser notifications are not supported here.')}
+        </p>
       </section>
 
       <section
@@ -540,6 +612,33 @@ export default function SettingsView() {
 
         </div>
 
+      </section>
+
+      <section
+        className="rounded-3xl p-6 mt-6"
+        style={{
+          background: theme.cardBg,
+          border: `1px solid ${theme.cardBorder}`,
+        }}
+      >
+        <p
+          className="text-xs font-bold tracking-[0.2em] uppercase mb-2"
+          style={{ color: theme.accent1 }}
+        >
+          Contact
+        </p>
+        <p className="text-sm mb-4" style={{ color: theme.textSecondary }}>
+          Visit my portfolio to see my work and get in touch.
+        </p>
+        <a
+          href="https://aniket-portfolio-react.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-transform hover:scale-[1.02]"
+          style={{ background: `${theme.accent1}18`, color: theme.accent1 }}
+        >
+          Visit portfolio <span aria-hidden="true">↗</span>
+        </a>
       </section>
 
     </div>

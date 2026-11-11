@@ -1,4 +1,5 @@
 export type ThemeId = 'dark' | 'light' | 'galaxy';
+export type TimerMode = 'focus' | 'short' | 'long';
 export type CursorStyle = 'default' | 'arc' | 'celebration' | 'gyroscope';
 
 export interface AppTheme {
