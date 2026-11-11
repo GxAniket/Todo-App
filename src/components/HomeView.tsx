@@ -1,4 +1,5 @@
 import { useApp } from '../App';
+import { formatLocalDate } from '../utils/date';
 
 const PRIORITY_COLORS: Record<string, string> = {
   low: '#10b981',
@@ -16,8 +17,7 @@ export default function HomeView() {
 
   const today = new Date();
 
-  const todayStr =
-    today.toISOString().split('T')[0];
+  const todayStr = formatLocalDate(today);
 
   // =========================
   // TODAY TASKS

@@ -54,4 +54,24 @@ export const themes: Record<ThemeId, AppTheme> = {
     gradientText:
       'linear-gradient(135deg, #7c3aed, #db2777, #0284c7)',
   },
+
+  galaxy: {
+    id: 'galaxy',
+    name: 'Galaxy',
+    description: 'Deep space with a glowing starfield',
+    emoji: '🌌',
+    bg: `radial-gradient(ellipse 75% 50% at 82% 5%, rgba(91,33,182,0.24), transparent 65%),
+      radial-gradient(ellipse 55% 45% at 8% 95%, rgba(14,116,144,0.18), transparent 75%),
+      linear-gradient(135deg, #080711 0%, #100d20 52%, #080b16 100%)`,
+    sidebarBg: 'rgba(10,9,20,0.97)',
+    cardBg: 'rgba(24,20,43,0.78)',
+    cardBorder: 'rgba(167,139,250,0.18)',
+    accent1: '#a78bfa',
+    accent2: '#e879f9',
+    accent3: '#67e8f9',
+    textPrimary: '#f7f4ff',
+    textSecondary: '#aaa2c2',
+    glow: '0 0 28px rgba(167,139,250,0.2)',
+    gradientText: 'linear-gradient(135deg, #c4b5fd, #f0abfc, #67e8f9)',
+  },
 };

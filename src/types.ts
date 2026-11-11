@@ -1,4 +1,5 @@
-export type ThemeId = 'dark' | 'light';
+export type ThemeId = 'dark' | 'light' | 'galaxy';
+export type CursorStyle = 'default' | 'arc' | 'celebration' | 'gyroscope';
 
 export interface AppTheme {
   id: ThemeId;

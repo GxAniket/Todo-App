@@ -1,4 +1,5 @@
 import { useApp } from '../App';
+import { formatLocalDate } from '../utils/date';
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -20,7 +21,7 @@ function getWeekDates(): Date[] {
 export default function WeekView() {
   const { theme, tasks, updateTask, setShowCreateModal } = useApp();
   const weekDates = getWeekDates();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatLocalDate(new Date());
 
   return (
     <div className="p-5 md:p-6 animate-fade-in pb-24 md:pb-6">
@@ -43,7 +44,7 @@ export default function WeekView() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {weekDates.map((date, idx) => {
-          const dateStr = date.toISOString().split('T')[0];
+          const dateStr = formatLocalDate(date);
           const dayTasks = tasks.filter(t => t.date === dateStr && !t.deleted);
           const isToday = dateStr === todayStr;
           const isWeekend = idx >= 5;

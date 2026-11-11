@@ -13,6 +13,7 @@ import type {
   StudySession,
   Subject,
   ThemeId,
+  CursorStyle,
 } from './types';
 
 import { themes } from './themes';
@@ -21,13 +22,19 @@ import Layout from './components/Layout';
 
 interface AppState {
   userName: string;
+  setUserName: (name: string) => void;
+  profileImage: string;
+  setProfileImage: (image: string) => void;
   theme: AppTheme;
   setTheme: (id: ThemeId) => void;
+  cursorStyle: CursorStyle;
+  setCursorStyle: (style: CursorStyle) => void;
 
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
+  clearSavedData: () => void;
 
   studySessions: StudySession[];
   addStudySession: (session: Omit<StudySession, 'id'>) => void;
@@ -74,6 +81,9 @@ export default function App() {
   const [userName, setUserName] = useState<string>(() =>
     loadData<string>('todo-user-name', '')
   );
+  const [profileImage, setProfileImage] = useState<string>(() =>
+    loadData<string>('todo-profile-image', '')
+  );
 
   // =========================
   // SCREEN
@@ -95,12 +105,14 @@ export default function App() {
   // THEME
   // =========================
   const [themeId, setThemeId] =
-    useState<ThemeId>(() =>
-      loadData<ThemeId>(
-        'todo-theme',
-        'dark'
-      )
-    );
+    useState<ThemeId>(() => {
+      const savedTheme = loadData<string>('todo-theme', 'dark');
+      return savedTheme === 'light' || savedTheme === 'galaxy' ? savedTheme : 'dark';
+    });
+
+  const [cursorStyle, setCursorStyle] = useState<CursorStyle>(() =>
+    loadData<CursorStyle>('todo-cursor-style', 'default')
+  );
 
   // =========================
   // TASKS
@@ -157,6 +169,10 @@ export default function App() {
     );
   }, [userName]);
 
+  useEffect(() => {
+    localStorage.setItem('todo-profile-image', JSON.stringify(profileImage));
+  }, [profileImage]);
+
   // =========================
   // SAVE THEME
   // =========================
@@ -166,6 +182,10 @@ export default function App() {
       JSON.stringify(themeId)
     );
   }, [themeId]);
+
+  useEffect(() => {
+    localStorage.setItem('todo-cursor-style', JSON.stringify(cursorStyle));
+  }, [cursorStyle]);
 
   // =========================
   // SAVE TASKS
@@ -261,6 +281,13 @@ export default function App() {
     []
   );
 
+  const clearSavedData = useCallback(() => {
+    setTasks([]);
+    setStudySessions([]);
+    localStorage.removeItem('todo-tasks');
+    localStorage.removeItem('todo-study-sessions');
+  }, []);
+
   // =========================
   // ADD STUDY SESSION
   // =========================
@@ -314,15 +341,21 @@ export default function App() {
     <AppContext.Provider
       value={{
         userName,
+        setUserName,
+        profileImage,
+        setProfileImage,
 
         theme,
 
         setTheme,
+        cursorStyle,
+        setCursorStyle,
 
         tasks,
         addTask,
         updateTask,
         deleteTask,
+        clearSavedData,
 
         studySessions,
         addStudySession,

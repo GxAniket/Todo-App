@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../App';
 import type { Task } from '../types';
+import { formatLocalDate } from '../utils/date';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const WEEK_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -13,7 +14,7 @@ export default function MonthView() {
   const { theme, tasks, updateTask, setShowCreateModal } = useApp();
   const today = new Date();
   const [view, setView] = useState({ year: today.getFullYear(), month: today.getMonth() });
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(formatLocalDate(today));
 
   const firstDay = new Date(view.year, view.month, 1);
   const lastDay = new Date(view.year, view.month + 1, 0);
@@ -26,7 +27,7 @@ export default function MonthView() {
     return null;
   });
 
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = formatLocalDate(today);
   const selectedTasks = tasks.filter(t => t.date === selectedDate && !t.deleted);
 
   const prev = () => setView(v => v.month === 0 ? { year: v.year - 1, month: 11 } : { ...v, month: v.month - 1 });
@@ -68,7 +69,7 @@ export default function MonthView() {
           <div className="grid grid-cols-7 gap-1">
             {cells.map((date, i) => {
               if (!date) return <div key={i} className="aspect-square" />;
-              const ds = date.toISOString().split('T')[0];
+              const ds = formatLocalDate(date);
               const dt = tasks.filter(t => t.date === ds && !t.deleted);
               const isToday = ds === todayStr;
               const isSelected = ds === selectedDate;

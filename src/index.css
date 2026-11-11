@@ -16,6 +16,11 @@ body {
   overflow: hidden;
 }
 
+.custom-cursor-enabled,
+.custom-cursor-enabled * {
+  cursor: none !important;
+}
+
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.45); border-radius: 2px; }

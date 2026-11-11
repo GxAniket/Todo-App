@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../App';
 import type { Priority } from '../types';
+import { formatLocalDate } from '../utils/date';
 
 const PRIORITY_OPTIONS: { id: Priority; label: string; color: string }[] = [
   { id: 'low', label: 'Low', color: '#10b981' },
@@ -11,7 +12,7 @@ const PRIORITY_OPTIONS: { id: Priority; label: string; color: string }[] = [
 export default function CreateTaskModal() {
   const { theme, addTask, setShowCreateModal } = useApp();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatLocalDate(new Date());
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(todayStr);

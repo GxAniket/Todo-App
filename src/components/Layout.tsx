@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../App';
+import { formatLocalDate } from '../utils/date';
 import type { NavItem } from '../types';
 import HomeView from './HomeView';
 import TodayView from './TodayView';
@@ -8,6 +9,8 @@ import MonthView from './MonthView';
 import StudyView from './StudyView';
 import SettingsView from './SettingsView';
 import CreateTaskModal from './CreateTaskModal';
+import Galaxy from './Galaxy';
+import CursorEffects from './CursorEffects';
 
 const navIconMap: Record<NavItem, string> = {
   home: '🏠', today: '📅', week: '📆', month: '🗓️',
@@ -29,12 +32,12 @@ const navItems: { id: NavItem; label: string }[] = [
 const mobileNavItems: NavItem[] = ['home', 'today', 'week', 'study', 'settings'];
 
 export default function Layout() {
-  const { theme, activeNav, setActiveNav, userName, tasks, showCreateModal, setShowCreateModal } = useApp();
+  const { theme, activeNav, setActiveNav, userName, profileImage, tasks, showCreateModal, setShowCreateModal, cursorStyle } = useApp();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = formatLocalDate(today);
   const todayTasks = tasks.filter(t => t.date === todayStr && !t.deleted);
   const completedToday = todayTasks.filter(t => t.completed).length;
   const progress = todayTasks.length > 0 ? (completedToday / todayTasks.length) * 100 : 0;
@@ -55,7 +58,33 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: theme.bg, color: theme.textPrimary, fontFamily: 'Outfit, sans-serif' }}>
+    <div className={`relative isolate flex h-full overflow-hidden ${cursorStyle === 'gyroscope' ? 'custom-cursor-enabled' : ''}`} style={{ background: theme.bg, color: theme.textPrimary, fontFamily: 'Outfit, sans-serif' }}>
+      {theme.id === 'galaxy' && (
+        <Galaxy
+          className="galaxy-background"
+          style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+          density={1}
+          glowIntensity={0.3}
+          flareIntensity={1}
+          starSpeed={0.5}
+          mouseRepulsion
+          clickWarp
+          starColors={[]}
+          hueShift={140}
+          saturation={0}
+          starSize={1}
+          twinkleIntensity={0.7}
+          speed={1.8}
+          rotationSpeed={0.1}
+          layers={4}
+          direction="forward"
+          repulsionStrength={2}
+          mouseInteraction
+          intro={false}
+          lightMode={false}
+        />
+      )}
+      <CursorEffects style={cursorStyle} />
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={() => setMobileOpen(false)} />
@@ -99,8 +128,10 @@ export default function Layout() {
           <div className="px-4 py-4 border-b flex-shrink-0" style={{ borderColor: theme.cardBorder }}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                style={{ background: `linear-gradient(135deg,${theme.accent1},${theme.accent2})` }}>
-                {userName.charAt(0).toUpperCase()}
+                style={{ background: `linear-gradient(135deg,${theme.accent1},${theme.accent2})`, overflow: 'hidden' }}>
+                {profileImage ? (
+                  <img src={profileImage} alt={`${userName}'s profile`} className="w-full h-full object-cover" />
+                ) : userName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: theme.textPrimary }}>{userName}</p>
@@ -168,10 +199,10 @@ export default function Layout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <main className="relative z-10 flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <header className="flex items-center gap-4 px-6 py-4 border-b flex-shrink-0"
-          style={{ borderColor: theme.cardBorder, background: `${theme.sidebarBg}80`, backdropFilter: 'blur(12px)' }}>
+          style={{ borderColor: theme.cardBorder, background: theme.sidebarBg, backdropFilter: 'blur(12px)' }}>
           <button className="md:hidden text-xl" style={{ color: theme.textSecondary }} onClick={() => setMobileOpen(true)}>
             ☰
           </button>
@@ -194,13 +225,6 @@ export default function Layout() {
                 <span className="text-xs font-mono" style={{ color: theme.textSecondary }}>{Math.round(progress)}%</span>
               </div>
             )}
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 rounded-xl text-white font-semibold text-sm transition-all"
-              style={{ background: `linear-gradient(135deg,${theme.accent1},${theme.accent2})`, boxShadow: `0 0 14px ${theme.accent1}40` }}
-            >
-              + Task
-            </button>
           </div>
         </header>
 

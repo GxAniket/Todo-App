@@ -1,5 +1,6 @@
 import { useApp } from '../App';
 import type { Task } from '../types';
+import { formatLocalDate } from '../utils/date';
 
 const PRIORITY_COLORS: Record<string, string> = {
   low: '#10b981', medium: '#f59e0b', high: '#ef4444',
@@ -13,7 +14,7 @@ interface Props {
 
 export default function TodayView({ filterImportant, filterCompleted, filterTrash }: Props) {
   const { theme, tasks, updateTask, deleteTask, setShowCreateModal } = useApp();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = formatLocalDate(new Date());
 
   let filtered: Task[];
   let title: string;

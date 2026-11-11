@@ -1,12 +1,36 @@
+import { useState } from 'react';
 import { useApp } from '../App';
+import { themes } from '../themes';
+import type { CursorStyle } from '../types';
+
+const CURSOR_OPTIONS: { id: CursorStyle; label: string; description: string; icon: string }[] = [
+  { id: 'default', label: 'Default', description: 'Use the normal pointer', icon: '↖' },
+  { id: 'arc', label: 'Arc Cursor', description: 'Electric light trail', icon: '⚡' },
+  { id: 'celebration', label: 'Celebration Cursor', description: 'Confetti trail and bursts', icon: '🎉' },
+  { id: 'gyroscope', label: 'Gyroscope Cursor', description: 'Orbiting rings and arrow', icon: '◎' },
+];
+
+const PROFILE_IMAGES = [
+  { src: '/aniket.jpg', label: 'Aniket' },
+  ...Array.from({ length: 8 }, (_, index) => ({ src: `/${index + 1}.jpg`, label: `Avatar ${index + 1}` })),
+];
 
 export default function SettingsView() {
   const {
     userName,
+    setUserName,
+    profileImage,
+    setProfileImage,
     theme,
     setTheme,
     tasks,
+    clearSavedData,
+    cursorStyle,
+    setCursorStyle,
   } = useApp();
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(userName);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   const completedTasks = tasks.filter(
     (task) => task.completed && !task.deleted
@@ -26,7 +50,7 @@ export default function SettingsView() {
     : 'U';
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto">
+    <div className="p-6 pb-28 md:p-8 md:pb-8 max-w-5xl mx-auto">
 
       {/* PAGE TITLE */}
       <h1 className="text-3xl font-bold mb-8">
@@ -52,7 +76,7 @@ export default function SettingsView() {
 
           {/* Avatar */}
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white"
+            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white overflow-hidden"
             style={{
               background:
                 'linear-gradient(135deg,#8b5cf6,#ec4899)',
@@ -60,7 +84,9 @@ export default function SettingsView() {
                 '0 0 25px rgba(139,92,246,0.3)',
             }}
           >
-            {initials}
+            {profileImage ? (
+              <img src={profileImage} alt={`${userName}'s profile`} className="w-full h-full object-cover" />
+            ) : initials}
           </div>
 
           <div>
@@ -75,6 +101,89 @@ export default function SettingsView() {
               Todo User
             </p>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={() => setShowImagePicker((show) => !show)}
+            className="rounded-xl px-3 py-2 text-sm font-semibold"
+            style={{ background: `${theme.accent1}18`, color: theme.accent1 }}
+          >
+            {showImagePicker ? 'Hide profile images' : 'Choose profile image'}
+          </button>
+          {showImagePicker && (
+            <div className="mt-4 grid grid-cols-3 sm:grid-cols-5 gap-3">
+              <button
+                type="button"
+                onClick={() => { setProfileImage(''); setShowImagePicker(false); }}
+                aria-label="Use initials instead of a profile image"
+                aria-pressed={!profileImage}
+                className="aspect-square rounded-full flex items-center justify-center text-xl font-bold"
+                style={{
+                  color: theme.textPrimary,
+                  background: `linear-gradient(135deg,${theme.accent1},${theme.accent2})`,
+                  border: `2px solid ${!profileImage ? theme.accent1 : theme.cardBorder}`,
+                }}
+              >{initials}</button>
+              {PROFILE_IMAGES.map((image) => (
+                <button
+                  key={image.src}
+                  type="button"
+                  onClick={() => { setProfileImage(image.src); setShowImagePicker(false); }}
+                  aria-label={`Select ${image.label} profile image`}
+                  aria-pressed={profileImage === image.src}
+                  className="aspect-square rounded-full overflow-hidden"
+                  style={{ border: `2px solid ${profileImage === image.src ? theme.accent1 : theme.cardBorder}` }}
+                >
+                  <img src={image.src} alt={image.label} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          {editingName ? (
+            <>
+              <input
+                value={nameDraft}
+                onChange={(event) => setNameDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && nameDraft.trim()) {
+                    setUserName(nameDraft.trim());
+                    setEditingName(false);
+                  }
+                  if (event.key === 'Escape') setEditingName(false);
+                }}
+                maxLength={40}
+                aria-label="Your name"
+                className="rounded-xl px-3 py-2 text-sm outline-none"
+                style={{ background: theme.cardBg, color: theme.textPrimary, border: `1px solid ${theme.cardBorder}` }}
+                autoFocus
+              />
+              <button
+                onClick={() => {
+                  if (!nameDraft.trim()) return;
+                  setUserName(nameDraft.trim());
+                  setEditingName(false);
+                }}
+                className="rounded-xl px-3 py-2 text-sm font-semibold text-white"
+                style={{ background: theme.accent1 }}
+              >Save name</button>
+              <button
+                onClick={() => { setNameDraft(userName); setEditingName(false); }}
+                className="rounded-xl px-3 py-2 text-sm"
+                style={{ color: theme.textSecondary, border: `1px solid ${theme.cardBorder}` }}
+              >Cancel</button>
+            </>
+          ) : (
+            <button
+              onClick={() => { setNameDraft(userName); setEditingName(true); }}
+              className="rounded-xl px-3 py-2 text-sm font-semibold"
+              style={{ background: `${theme.accent1}18`, color: theme.accent1 }}
+            >Edit name</button>
+          )}
         </div>
 
         {/* Stats */}
@@ -149,6 +258,65 @@ export default function SettingsView() {
         </div>
       </section>
 
+      <section
+        className="rounded-3xl p-6 mb-6"
+        style={{ background: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+      >
+        <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#ef4444' }}>
+          Saved data
+        </p>
+        <p className="text-sm mb-4" style={{ color: theme.textSecondary }}>
+          Permanently remove all {totalTasks} saved tasks and study sessions from this device.
+        </p>
+        <button
+          onClick={() => {
+            if (window.confirm('Delete all saved tasks and study sessions? This cannot be undone.')) {
+              clearSavedData();
+            }
+          }}
+          className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
+          style={{ background: '#dc2626' }}
+        >Delete saved data</button>
+      </section>
+
+      <section
+        className="rounded-3xl p-6 mb-6"
+        style={{ background: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+      >
+        <p className="text-xs font-bold tracking-[0.2em] uppercase mb-2" style={{ color: theme.accent3 }}>
+          Cursor
+        </p>
+        <p className="text-sm mb-4" style={{ color: theme.textSecondary }}>
+          Choose a pointer effect. It is saved on this device.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {CURSOR_OPTIONS.map((option) => {
+            const selected = cursorStyle === option.id;
+            return (
+              <button
+                key={option.id}
+                onClick={() => setCursorStyle(option.id)}
+                aria-pressed={selected}
+                className="rounded-2xl p-4 text-left transition-all"
+                style={{
+                  background: selected ? `${theme.accent1}18` : `${theme.textPrimary}05`,
+                  border: `1px solid ${selected ? theme.accent1 : theme.cardBorder}`,
+                  boxShadow: selected ? `0 0 18px ${theme.accent1}20` : 'none',
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl" aria-hidden="true">{option.icon}</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: theme.textPrimary }}>{option.label}</p>
+                    <p className="text-xs mt-1" style={{ color: theme.textSecondary }}>{option.description}</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       {/* ================= THEME ================= */}
       <section
         className="rounded-3xl p-6 mb-6"
@@ -165,7 +333,7 @@ export default function SettingsView() {
           Appearance
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
           {/* DARK MODE */}
           <button
@@ -301,6 +469,30 @@ export default function SettingsView() {
             )}
           </button>
 
+          {/* GALAXY */}
+          <button
+            onClick={() => setTheme('galaxy')}
+            className="relative rounded-2xl overflow-hidden text-left transition-all duration-300"
+            style={{
+              border: theme.id === 'galaxy' ? '2px solid #a78bfa' : '2px solid rgba(167,139,250,0.15)',
+              boxShadow: theme.id === 'galaxy' ? '0 0 25px rgba(167,139,250,0.35)' : 'none',
+            }}
+          >
+            <div className="h-28" style={{ background: themes.galaxy.bg }} />
+            <div className="p-4" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🌌</span>
+                <div>
+                  <h3 className="font-bold">Galaxy</h3>
+                  <p className="text-xs" style={{ color: theme.textSecondary }}>A glowing deep space starfield</p>
+                </div>
+              </div>
+            </div>
+            {theme.id === 'galaxy' && (
+              <span className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs" style={{ background: '#8b5cf6' }}>✓</span>
+            )}
+          </button>
+
         </div>
       </section>
 
@@ -324,13 +516,13 @@ export default function SettingsView() {
 
           <img
             src="/todo-logo.png"
-            alt="Todo"
+            alt="Todo - GxAniket (Owner)"
             className="h-12 sm:h-14 w-auto max-w-[220px] object-contain flex-shrink-0"
           />
 
           <div>
             <h2 className="text-xl font-bold">
-              Todo
+              Todo - GxAniket (Owner)
             </h2>
 
             <p
@@ -339,7 +531,10 @@ export default function SettingsView() {
                 color: theme.textSecondary,
               }}
             >
-              Todo Application version - 1.0
+              Todo Application version - 2.5
+            </p>
+            <p className="text-xs mt-1" style={{ color: theme.textSecondary }}>
+              © 2026 - 2027 Aniket Sundriyal. All rights reserved.
             </p>
           </div>
 

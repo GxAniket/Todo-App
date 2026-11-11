@@ -390,7 +390,9 @@ export default function Onboarding({ onComplete }: Props) {
           className="text-center text-xs mt-6"
           style={{ color: '#555577' }}
         >
-          Todo Application version - 1.0
+          <span>Todo Application version - 2.5</span>
+          <br />
+          © 2026 - 2027 Aniket Sundriyal. All rights reserved.
         </p>
       </div>
     </div>
