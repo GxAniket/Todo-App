@@ -12,7 +12,9 @@ A modern and responsive **task management and productivity application** built w
 
 Users can create, edit, complete, and delete tasks while managing priorities and schedules. The application also provides dedicated views for daily, weekly, and monthly planning.
 
-For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help organize study goals and maintain focused work sessions.
+For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help organize study goals and maintain focused work sessions. The Pomodoro timer keeps running when you switch between screens.
+
+The project is currently a website. An installable app version is planned for the future.
 
 ---
 
@@ -23,6 +25,8 @@ For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help o
 - Edit existing tasks
 - Mark tasks as completed
 - Delete tasks
+- Move deleted tasks to Trash
+- Mark tasks as important
 - Set task priority:
   - 🟢 Low
   - 🟡 Medium
@@ -38,13 +42,18 @@ For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help o
 - Study planner
 - Create study goals and chapters
 - Pomodoro timer for focused sessions
+- Keep the timer running while navigating to other screens
 - Organize study activities alongside regular tasks
 
 ### 🎨 User Experience
 - 🌙 Dark mode
 - ☀️ Light mode
+- 🌌 Galaxy theme
+- 🖱️ Default, Arc, Celebration, and Gyroscope cursor effects
+- 👤 Profile name and selectable profile pictures
+- 🔔 Optional task reminder notifications and sound while the website is open
 - 📱 Responsive design
-- 💾 Persistent data using Browser Local Storage
+- 💾 Tasks and preferences saved in Browser Local Storage
 - ⚡ Fast and modern React interface
 
 ---
@@ -67,8 +76,18 @@ For students, Todo includes a **Study Planner** and **Pomodoro Timer** to help o
 
 <p align="center">
   <img 
-    src="https://github.com/user-attachments/assets/dcf6782d-04aa-4ac0-b1ea-7cb2bd9d5638"
-    alt="Todo App Screenshot"
+    src="https://github.com/user-attachments/assets/f83fd729-498d-4dd4-a102-8ece3defc074"
+    alt="Todo App home screen"
+    width="100%"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/02eca418-c7d1-40ce-8936-28e6b220a3ca"
+    alt="Todo App study timer screen"
+    width="100%"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/f7a45548-fd16-407a-bcaf-e4572bd89fe7"
+    alt="Todo App settings screen"
     width="100%"
   />
 </p>
@@ -88,7 +107,9 @@ Try the application here:
 ```text
 Todo App/
 ├── public/
-│   └── assets/
+│   ├── 1.jpg ... 8.jpg
+│   ├── aniket.jpg
+│   └── todo-logo.png
 │
 ├── src/
 │   ├── components/
@@ -168,13 +189,15 @@ Todo App uses the browser's **Local Storage API** to persist task and applicatio
 
 This means tasks remain available after refreshing or reopening the application in the same browser.
 
-> Note: Data is stored locally in the user's browser and is not synchronized across different devices.
+> Note: Data is stored locally in the user's browser and is not synchronized across different devices. Task reminders work while the website is open and require browser notification permission.
 
 ---
 
 ## 🤝 Contributing
 
 Contributions, suggestions, and improvements are welcome!
+
+Anyone is welcome to fork this repository, use it as a starting point, and make it their own.
 
 If you have an idea that can improve **Todo App**, you can:
 
@@ -216,6 +239,10 @@ Building Todo App helped me understand how to transform a productivity concept i
   
   <a href="https://www.linkedin.com/in/aniket-sundriyal">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+  </a>
+
+  <a href="https://aniket-portfolio-react.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-Visit-8b5cf6?style=for-the-badge" alt="Portfolio">
   </a>
 </p>
 
